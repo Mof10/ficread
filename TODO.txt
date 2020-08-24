@@ -1,0 +1,3 @@
+add main window class
+comments, comments, comments
+improve the whole thing
