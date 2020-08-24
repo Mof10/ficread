@@ -40,9 +40,6 @@ GLOBALlogPath = dirname(abspath(__file__)) + "\\log.txt"
 #Any extra windows open in the centre of the central window
 #Changing themes
 
-# def rem_Non_Ascii(text):
-# 	return unidecode(unicode(text, encoding = "utf-8"))
-
 class URLWin(QWidget, parent.posClass):
 	closed = pyqtSignal()
 
@@ -605,7 +602,11 @@ class window(QWidget):
 
 	def showDet(self):
 		dims = self.findDims()
-		self.detWin.updatePos(dims[0], dims[1])		
+		self.detWin.updatePos(dims[0], dims[1])	
+		self.disButtons()
+		def onClose():
+			self.enButtons()
+		self.detWin.closed.connect(onClose)
 		self.detWin.show()
 
 	def webGet(self):

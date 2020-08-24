@@ -6,8 +6,7 @@ if __name__ == "__main__":
 	from PyQt5.QtWidgets import QApplication
 import parent
 
-class webWin(QWidget, parent.posClass):
-	closed = pyqtSignal()
+class webWin(QWidget, parent.posClass, parent.win):
 	def __init__(self):
 		super().__init__()
 		self.dim = [0, 0]
@@ -25,10 +24,6 @@ class webWin(QWidget, parent.posClass):
 	def updateDim(self):
 		self.dim[0] = self.geometry().width()
 		self.dim[1] = self.geometry().height()
-
-	def closeEvent(self, event):
-		self.closed.emit()
-		self.close()
 
 	def setURL(self, URL):
 		self.web.load(QUrl(URL))

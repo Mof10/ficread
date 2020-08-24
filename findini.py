@@ -17,8 +17,7 @@ if __name__ == "__main__":
 GLOBALdoLog = True
 GLOBALlogPath = dirname(abspath(__file__)) + "\\log.txt"
 
-class iniWin(QWidget, parent.posClass):
-	closed = pyqtSignal()
+class iniWin(QWidget, parent.posClass, parent.win):
 	retSig = pyqtSignal()
 
 	def __init__(self, folder):
@@ -53,10 +52,6 @@ class iniWin(QWidget, parent.posClass):
 
 		self.ldButton.clicked.connect(self.ret)
 		self.iniList.activated.connect(self.loadFandom)
-
-	def closeEvent(self, event):
-		self.closed.emit()
-		self.close()
 
 	def ret(self):
 		self.retSig.emit()

@@ -6,9 +6,7 @@ if __name__ == "__main__":
 	from PyQt5.QtWidgets import QApplication
 	app = QApplication([])
 
-class fontWin(QWidget, parent.posClass):
-	
-	closed = pyqtSignal()
+class fontWin(QWidget, parent.posClass, parent.win):
 
 	def __init__(self, font, size):#, screenSize, parPos):
 		super().__init__()
@@ -52,10 +50,6 @@ class fontWin(QWidget, parent.posClass):
 	# 	pos = self.findPos(parentPos, parentDim, self.dim)
 
 	# 	self.setGeometry(pos[0], pos[1], self.dim[0], self.dim[1])
-
-	def closeEvent(self, event):
-		self.closed.emit()
-		self.close()
 
 	def reload(self):
 		self.font.setFamily(self.fontBox.currentText())

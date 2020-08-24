@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QWidget
+from PyQt5.QtCore import pyqtSignal
 import ctypes
 
 class posClass():
@@ -34,4 +35,12 @@ class posClass():
 	def updatePos(self, parentPos, parentDim):
 		pos = self.findPos(parentPos, parentDim, self.dim)
 
-		self.setGeometry(pos[0], pos[1], self.dim[0], self.dim[1])		
+		self.setGeometry(pos[0], pos[1], self.dim[0], self.dim[1])
+
+class win():
+
+	closed = pyqtSignal()
+
+	def closeEvent(self, event):
+		self.closed.emit()
+		self.close()

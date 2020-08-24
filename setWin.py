@@ -11,8 +11,7 @@ if __name__ == "__main__":
 
 import alertBox
 
-class setWin(QWidget, parent.posClass):
-	closed = pyqtSignal()
+class setWin(QWidget, parent.posClass, parent.win):
 
 	def __init__(self, ficSave, iniSave, url, doAsk):
 		super().__init__()
@@ -88,9 +87,6 @@ class setWin(QWidget, parent.posClass):
 		self.ficSBButton.clicked.connect(self.getFicSave)
 		self.iniSBButton.clicked.connect(self.getIniSave)
 		self.changeURLButton.clicked.connect(self.getURL)
-		
-	def closeEvent(self, event):
-		self.closed.emit()
 
 	def getFicSave(self):
 		self.disButtons()

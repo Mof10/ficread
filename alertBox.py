@@ -8,9 +8,7 @@ if __name__ == "__main__":
 	from PyQt5.QtWidgets import QApplication
 	app = QApplication([])	
 
-class alertWin(QWidget, parent.posClass):
-
-	closed = pyqtSignal()
+class alertWin(QWidget, parent.posClass, parent.win):
 
 	def __init__(self):
 		super().__init__()
@@ -39,9 +37,6 @@ class alertWin(QWidget, parent.posClass):
 	def updateDim(self):
 		self.dim[0] = self.geometry().width()
 		self.dim[1] = self.geometry().height()
-
-	def closeEvent(self, event):
-		self.closed.emit()
 
 	def disAlert(self, text):
 		self.updateDim()

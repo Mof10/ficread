@@ -7,8 +7,7 @@ if __name__ == "__main__":
 	app = QApplication([])
 
 
-class deetWin(QWidget, parent.posClass):
-	closed = pyqtSignal()
+class deetWin(QWidget, parent.posClass, parent.win):
 	def __init__(self):
 		super().__init__()
 		self.win = QTextEdit()
@@ -17,9 +16,6 @@ class deetWin(QWidget, parent.posClass):
 		self.layout.addWidget(self.win, 0, 0, -1, -1)
 		self.setLayout(self.layout)
 		self.dim = [720, 480]
-
-	def closeEvent(self, event):
-		self.closed.emit()
 
 if __name__ == "__main__":
 
