@@ -37,12 +37,13 @@ GLOBALlogPath = dirname(abspath(__file__)) + "\\log.txt"
 #Edit font / size, likely through another window done
 #Default save folder with 'Ask where to save every html file?' done
 #Check for updated fic?
-#Any extra windows open in the centre of the central window
-#Changing themes
+#Any extra windows open in the centre of the central window //done
+#Changing themes // done
+#On close, ask the user if they wish to save
+#On open, ask the reader if they want to continue what they were reading last
 
-class URLWin(QWidget, parent.posClass):
-	closed = pyqtSignal()
-
+#A window that the user may enter an AO3 url into, 
+class URLWin(QWidget, parent.posClass, parent.win):
 	def __init__(self):
 		super().__init__()
 		self.setWindowTitle("AO3 Work URL")
@@ -55,12 +56,7 @@ class URLWin(QWidget, parent.posClass):
 		self.templay.addWidget(self.tempEnt)
 		self.setLayout(self.templay)
 
-		#Usually, the close event is just to emit a closed signal, though the 
-		#main window should close all active windows as it closes.
-	def closeEvent(self, event):
-		self.closed.emit()
-		self.close()
-
+#Class to house all details related to the reading, such as current chapter, page counts, etc
 class detail():
 	def __init__(self):
 		#The chapter contents, structures as a list of lists, [Num, Title, chapCon[]]
@@ -75,8 +71,10 @@ class detail():
 		self.title = ""
 		self.author = ""
 		self.fandom = ""
+		#This is housing html tags in order to place around the chapter text to make the themes work.
 		self.pre = "<html>"
 		self.post = "</body></html>"
+		#Style is set in the main window class by the getStyle() function
 		self.style = ""
 		self.tempimg = ""
 
@@ -120,17 +118,21 @@ class detail():
 		self.currPages[self.chapter] -= 1
 		self.setParaCount()
 
+		#Returns a formatted string that has the current paragraph text surrounded by the style
 	def pageText(self):
 		return self.pre + self.style + self.chapters[self.chapter][2][self.currPages[self.chapter]] + self.post
 
 
 #Find aspects of an html file that are needed to set in the detail class.
 def findTags(file):
-	#searching for the tag window, title + author, fandom, and the URL.
-
+	
+	#Find the works url in the html document using bs4
 	def findURL(href):
 		return href and re.compile("works").search(href)
+	#Temp is the list to be returned
 	temp = []
+
+	#searching for the tag window, title + author, fandom, and the URL.
 	soup = BeautifulSoup(codecs.open(file, 'r', 'utf-8'), "html.parser")
 	temp.append(str(soup.find("dl", class_="tags")))
 	temp.append(soup.find("h1").get_text() + " by " + soup.find("a", rel="author").get_text())
@@ -142,6 +144,7 @@ def findTags(file):
 
 	return temp
 
+#Screen width and Screen height.
 user32 = ctypes.windll.user32
 screenW = user32.GetSystemMetrics(0)
 screenH = user32.GetSystemMetrics(1)
@@ -234,7 +237,7 @@ class window(QWidget):
 
 		#The fic window.
 		self.html = QTextBrowser(self)
-		self.getStyle()		
+		self.getStyle()
 
 		#Window where the user can change their font. Uses the current font family
 		#From the font object
@@ -265,16 +268,6 @@ class window(QWidget):
 		#Prepare a window for any needed alerts.
 		self.alert = alertBox.alertWin()
 
-	# def setColour(self):
-	# 	bCol = QColor()
-	# 	bCol.setRgb(30, 30, 30)
-	# 	tCol = QColor()
-	# 	tCol.setRgb(206, 206, 206)
-	# 	# print("done")
-	# 	self.html.setTextBackgroundColor(bCol)
-	# 	self.html.setTextBackgroundColor(tCol)
-
-
 	#If the default directories don't exist (likely at first startup), create them.
 	def initDir(self):
 		if not os.path.exists(self.baseSave):
@@ -289,15 +282,15 @@ class window(QWidget):
 			with open(self.baseSave + "style.html", 'w') as file:
 				file.write("<style>\nbody {\n\tbackground-color:#FFFFFF;\n\tcolor:#000000;\n\tmargin-top:40px;\n\tmargin-bottom:10px;\n\tmargin-right:40px;\n\tmargin-left:40px; \n}\n a { \n\tcolor:#CECECE;\n}\n</style>")	
 
-
+	#Parse the style.html file in the root folder. This probably doesn't need the bs4 module to work.
 	def getStyle(self):
 		soup = BeautifulSoup(open(self.baseSave + "style.html", 'r'), 'html.parser')
 		self.html.setStyleSheet("background-color:" + self.theme.bgColor.text() + ";" + "padding-top:30px;" + "padding-left:20px;" + "padding-right:20px;" + "color:" + self.theme.tColor.text() + ";")
 		self.dts.style = str(soup.find("style"))
-		# print(self.dts.style)
 		self.html.setText(self.startText)
 
 
+	#Initialize the menubar
 	def setMenu(self):
 		openFont = QAction("&Font Settings...", self)
 		openFont.setShortcut("Ctrl+Shift+F")
@@ -320,6 +313,7 @@ class window(QWidget):
 		fMenu.addAction(openSet)
 		fMenu.addAction(openTheme)
 
+		#Note that this is one of the main window attributes
 		self.layout.setMenuBar(menuBar)
 
 
@@ -330,6 +324,7 @@ class window(QWidget):
 		urlTxt = open(self.homePath + "\\save\\url.txt", 'w', encoding='utf-8')
 		urlTxt.write(self.defURL)
 		urlTxt.close()
+		#Using the configparser module
 		saver['Settings'] = {'ficsavepath' : self.defSave,
 							 'inisavepath' : self.defIniSave,
 							 'defaulturlpath' :  self.homePath + "\\save\\url.text",
@@ -354,7 +349,9 @@ class window(QWidget):
 			#Need to create it first.
 			self.saveSettings()
 
+		#Change the theme, namely the text and the background colour.
 	def changeTheme(self):
+		#Theme is an attribute in the main window that opens a theme class.
 		self.theme.show()
 		def onClose():
 			self.getStyle()
@@ -365,28 +362,22 @@ class window(QWidget):
 	#Change the ini file once the user clicks apply in the change settings window
 	def changeSettings(self):
 		self.disButtons()
-		dims = self.findDims()
-		self.setWin.updatePos(dims[0], dims[1])
+		self.setDims(self.setWin)
 		self.setWin.show()
 		def onClose():
 			self.setWin.close()
-			#Pretty standard function to re-enable buttons after a popped up window disabled
-			#them
-			if(self.dts.filepath != ""):
-				self.enButtons()
-			else:
-				self.noFicEnButtons()
+			self.enButtons()
 		#Change all of the current settings and save it as an ini
-		#adding the slash at the end if needed ensures that additions
-		#later are very easy to add.
 		def change():
 			self.defIniSave = self.setWin.iniSavePath.text()			
 			if(self.defIniSave[-1] != '/'):
 				self.defIniSave += '/'
 			self.defSave = self.setWin.ficSavePath.text()
+			#If the filepath doesn't end with a slash, add it in order to make later additions easier
 			if(self.defSave[-1] != '/'):
 				self.defSave += '/'
 			self.defURL = self.setWin.defaultURL.text()
+			#doAsk is a bool signifying whether or not the user wishes to be asked where to save every downloaded html file.
 			self.doAsk = self.setWin.doAsk.isChecked()
 			self.saveSettings()
 			self.showAlert("Changes Applied!")
@@ -414,6 +405,7 @@ class window(QWidget):
 
 		#Change the properties of each widget
 	def initUI(self):
+		#Default button enable / disable
 		self.filebox.setReadOnly(True)
 		self.lButton.setDisabled(True)
 		self.rButton.setDisabled(True)
@@ -443,6 +435,7 @@ class window(QWidget):
 		self.jBox.setFixedWidth(100)
 		self.lButton.setFixedWidth(100)
 
+		#Someday, this will probably be read from an ini file
 		self.setGeometry(int((screenW - 900) / 2), int((screenH - 720) / 2), 900, 720)
 		self.setWindowTitle("Paragraph Fic Reader Beta")
 		self.initLayout()
@@ -475,10 +468,8 @@ class window(QWidget):
 		self.layout.addWidget(self.jButton, 0, 4, 1, 1)
 		self.layout.addWidget(self.jBox, 0, 3, 1, 1)
 		self.layout.addWidget(self.openFicPage, 4, 4, 1, 1)
-		# self.layout.setColumnStretch(3, 2)
 
 		#Connect any buttons to functions
-		#Connect the buttons to their respective functions
 	def connect(self):
 		self.brButton.clicked.connect(self.ldFile)
 		self.lButton.clicked.connect(self.left)
@@ -495,6 +486,7 @@ class window(QWidget):
 		self.openFicPage.clicked.connect(self.openAO3Page)
 
 
+		#Function to enable only certain buttons when there is no fic loaded.
 	def noFicEnButtons(self):
 		self.brButton.setDisabled(False)
 		self.webBrButton.setDisabled(False)
@@ -505,12 +497,13 @@ class window(QWidget):
 		else:
 			self.ldButton.setDisabled(False)
 
+		#Show an alert box (using the alertBox class) that displays the text parameter.
 	def showAlert(self, text):
 		self.alert.alert.setText(text)
-		# self.alert.updateDim()
 		self.alert.updatePos(self.findDims()[0], self.findDims()[1])
 		self.alert.show()
 
+	#Jump to a certain paragraph by user input
 	def jump(self):
 		inBox = self.jBox.text().strip()
 		def isInt(s):
@@ -519,8 +512,10 @@ class window(QWidget):
 				return True
 			except ValueError:
 				return False
+		#Check if the stripped input is actually a number
 		if(isInt(inBox)):
 			inBox = int(inBox)
+			#Check if the input is within the bounds of the paragraph count for the particular chapter
 			if(inBox > 0 and inBox <= len(self.dts.chapters[self.dts.chapter][2])):
 				self.dts.currPages[self.dts.chapter] = inBox - 1
 				self.setText()
@@ -541,12 +536,13 @@ class window(QWidget):
 				self.jBox.setText("")
 			self.alert.closed.connect(onClose)
 
+	#Disable all visible buttons
 	def disButtons(self):
 		for x in self.buttons:
 			x.setDisabled(True)
 
+	#Enable all of the buttons, 
 	def enButtons(self):
-
 		for x in self.buttons:
 			x.setDisabled(False)
 		if(self.dts.filepath == ""):
@@ -556,11 +552,14 @@ class window(QWidget):
 		if(self.windowTitle() == "Paragraph Fic Reader Beta"):
 			self.sButton.setDisabled(True)
 
+	#Find the dimensions of the parent window (The main window)
 	def findDims(self):
 		currentPos = [self.pos().x(), self.pos().y()]
 		currentDim = [self.geometry().width(), self.geometry().height()]
 		return [currentPos, currentDim]		
 
+	#Opens the changeFont window, allowing for users to pick their family and size.
+	#Might add the functionality that the theme applies, too.
 	def changeFont(self):
 		dims = self.findDims()
 		self.fWin.updatePos(dims[0], dims[1])
@@ -570,12 +569,10 @@ class window(QWidget):
 			self.font.setFamily(self.fWin.fontBox.currentText())
 			self.font.setPointSize(int(self.fWin.sizeBox.currentText()))
 			self.html.setFont(self.font)
-			if(self.dts.filepath != ""):
-				self.enButtons()
-			else:
-				self.noFicEnButtons()
+			self.enButtons()
 		self.fWin.closed.connect(setF)
 
+	#Save the chosen font to an ini file
 	def saveFont(self):
 		saver = configparser.ConfigParser()
 		saver['FontDetails'] = {'Size' : str(self.font.pointSize()),
@@ -583,47 +580,59 @@ class window(QWidget):
 		with open(self.homePath + '\\save\\font.ini', 'w') as configfile:
 			saver.write(configfile)
 
+	#Load the fonts from the ini file.
 	def loadFont(self):
 		if(os.path.exists(self.homePath + '\\save\\font.ini')):
+			#There is a little bit of funky errors from loading ini files at times, so create a log file to log any of them
 			try:
 				loader = configparser.ConfigParser()
 				loader.read(self.homePath + '\\save\\font.ini')
 				test = int(loader['FontDetails']['size'])
-				# self.font.setPointSize(int(loader['FontDetails']['size']))
 				self.font.setFamily(loader['FontDetails']['name'])
 				self.html.setFont(self.font)
 			except:
-				print("Error in INI read")
+				create = open(GLOBALlogPath, 'w', encoding='utf-8')
+				create.append("Error reading ini file: " + self.homePath + '\\save\\font.ini')
+				create.close()
+				self.showAlert("Alert: Error reading font. Please reselect font.")
+				self.disButtons()
+				def onClose():
+					self.changeFont()
+					self.saveFont()
+					self.enButtons()
+				self.alert.closed.connect(onClose)
 		else:
+			#If the ini file exists, prompt the user to choose a font and size. (This should only happen on the first run of the program.)
 			self.changeFont()
 			self.saveFont()
 
-			
-
-	def showDet(self):
+	#Set the dimensions to centre the wind widget parameter
+	def setDims(self, wind):
 		dims = self.findDims()
-		self.detWin.updatePos(dims[0], dims[1])	
+		wind.updatePos(dims[0], dims[1])
+
+	#Show the 'fic details' window
+	def showDet(self):
+		self.setDims(self.detWin)
 		self.disButtons()
 		def onClose():
 			self.enButtons()
 		self.detWin.closed.connect(onClose)
 		self.detWin.show()
 
+	#Show the ao3 web browser 
 	def webGet(self):
 		self.disButtons()
 		dims = self.findDims()
 		self.web.updateDim()
-		self.web.updatePos(dims[0], dims[1])			
-		# self.web.web.load(QUrl("https://archiveofourown.org/media"))	
+		self.web.updatePos(dims[0], dims[1])
 		def onClose():
-			if(self.dts.filepath != ""):
-				self.enButtons()
-			else:
-				self.noFicEnButtons()
+			self.enButtons()
 		self.web.closed.connect(onClose)
 		self.web.setURL(self.defURL)
 		self.web.show()
 
+	#
 	def retWeb(self):
 		self.web.subButton.setDisabled(True)
 		self.subURL(self.web.dispURL.text())
@@ -711,16 +720,12 @@ class window(QWidget):
 			self.subURL(self.urlWin.tempBox.text())
 			self.urlWin.tempEnt.setDisabled(False)
 		def onClose():
-			if(self.dts.filepath != ""):
-				self.enButtons()
-			else:
-				self.noFicEnButtons()
+			self.enButtons()
 		self.urlWin.tempEnt.clicked.connect(passURL)
 		self.urlWin.tempBox.returnPressed.connect(passURL)
 		self.urlWin.closed.connect(onClose)
 		dims = self.findDims()
 		self.urlWin.updatePos(dims[0], dims[1])
-		self.urlWin.show()		
 		self.urlWin.show()
 
 	def subURL(self, url):
@@ -800,6 +805,9 @@ class window(QWidget):
 			else:
 				self.noFicEnButtons()
 
+	def fixName(self, string):
+		return re.sub('["/:*?<>|]', '', string).replace("\\", "")
+
 
 	def saveFic(self):
 
@@ -815,7 +823,7 @@ class window(QWidget):
 								'Title' : str(self.dts.title),
 								'Url' : self.dts.url,
 								'Fandom' : str(self.dts.fandom)}
-		with open(self.defIniSave + self.dts.title + ".ini", 'w') as configfile:
+		with open(self.defIniSave + self.fixName(self.dts.title) + ".ini", 'w') as configfile:
 			save.write(configfile)
 		if(len(self.iniWin.dirs) <= 0):
 			self.iniWin.loadFiles()
@@ -849,6 +857,7 @@ class window(QWidget):
 				self.webBrButton.setDisabled(False)
 				self.ldButton.setDisabled(False)
 		self.iniWin.folder = self.defIniSave + "/"
+		self.iniWin.clear()
 		self.iniWin.loadFiles()
 		self.iniWin.closed.connect(onClose)
 		def onRet():
@@ -856,8 +865,7 @@ class window(QWidget):
 			self.enButtons()
 		self.iniWin.retSig.connect(onRet)
 
-		dims = self.findDims()
-		self.iniWin.updatePos(dims[0], dims[1])
+		self.setDims(self.iniWin)
 		self.iniWin.show()	
 
 	def openAO3Page(self):

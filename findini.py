@@ -57,6 +57,12 @@ class iniWin(QWidget, parent.posClass, parent.win):
 		self.retSig.emit()
 		self.close()
 
+	def clear(self):
+		self.dirs.clear()
+		self.titles.clear()
+		self.fandoms.clear()
+
+
 	def loadFandom(self):
 		ind = self.iniList.currentIndex()
 		load = configparser.ConfigParser()
