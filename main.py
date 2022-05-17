@@ -1,4 +1,4 @@
-from fbs_runtime.application_context.PyQt5 import ApplicationContext
+# from fbs_runtime.application_context.PyQt5 import ApplicationContext
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.Qt import Qt
@@ -42,7 +42,7 @@ GLOBALlogPath = dirname(abspath(__file__)) + "\\log.txt"
 #On close, ask the user if they wish to save
 #On open, ask the reader if they want to continue what they were reading last
 
-#A window that the user may enter an AO3 url into, 
+#A window that the user may enter an AO3 url into,
 class URLWin(QWidget, parent.posClass, parent.win):
 	def __init__(self):
 		super().__init__()
@@ -101,7 +101,7 @@ class detail():
 
 		#Sets up the paragraph counter, usually called from the main window
 	def setParaCount(self):
-		self.paraCountstr = str(self.currPages[self.chapter] + 1) + " out of " + str(len(self.chapters[self.chapter][2]))		
+		self.paraCountstr = str(self.currPages[self.chapter] + 1) + " out of " + str(len(self.chapters[self.chapter][2]))
 
 		#Sets all pagees to 0
 	def initPages(self):
@@ -125,7 +125,7 @@ class detail():
 
 #Find aspects of an html file that are needed to set in the detail class.
 def findTags(file):
-	
+
 	#Find the works url in the html document using bs4
 	def findURL(href):
 		return href and re.compile("works").search(href)
@@ -176,7 +176,7 @@ class window(QWidget):
 			create.close()
 
 		#Load all of the settings from the settings.ini file.
-		self.loadSettings()	
+		self.loadSettings()
 
 		#Initializing the settings window with the current defaults
 		self.setWin = setWin.setWin(self.defSave, self.defIniSave, self.defURL, self.doAsk)
@@ -212,13 +212,13 @@ class window(QWidget):
 		self.chapterBox = QComboBox(self)
 
 		self.buttons = [self.lButton, self.rButton, self.sButton, self.wbButton, self.ldButton, self.brButton, self.webBrButton, self.FDButton,
-		self.jButton, self.jBox, self.chapterBox, self.openFicPage]		
+		self.jButton, self.jBox, self.chapterBox, self.openFicPage]
 
 		#Displays current filepath or URL, I forget which one at which times.
 		self.filebox = QLineEdit("Filepath or URL: ", self)
 
 		self.theme = themeWin.themeWin(self.baseSave + "style.html")
-		
+
 		# self.setColour()
 		self.font = QFont()
 		self.font.setPointSize(24)
@@ -280,7 +280,7 @@ class window(QWidget):
 			os.mkdir(self.baseSave + "\\tempimg\\")
 		if not os.path.exists(self.baseSave + "style.html"):
 			with open(self.baseSave + "style.html", 'w') as file:
-				file.write("<style>\nbody {\n\tbackground-color:#FFFFFF;\n\tcolor:#000000;\n\tmargin-top:40px;\n\tmargin-bottom:10px;\n\tmargin-right:40px;\n\tmargin-left:40px; \n}\n a { \n\tcolor:#CECECE;\n}\n</style>")	
+				file.write("<style>\nbody {\n\tbackground-color:#FFFFFF;\n\tcolor:#000000;\n\tmargin-top:40px;\n\tmargin-bottom:10px;\n\tmargin-right:40px;\n\tmargin-left:40px; \n}\n a { \n\tcolor:#CECECE;\n}\n</style>")
 
 	#Parse the style.html file in the root folder. This probably doesn't need the bs4 module to work.
 	def getStyle(self):
@@ -369,7 +369,7 @@ class window(QWidget):
 			self.enButtons()
 		#Change all of the current settings and save it as an ini
 		def change():
-			self.defIniSave = self.setWin.iniSavePath.text()			
+			self.defIniSave = self.setWin.iniSavePath.text()
 			if(self.defIniSave[-1] != '/'):
 				self.defIniSave += '/'
 			self.defSave = self.setWin.ficSavePath.text()
@@ -451,16 +451,16 @@ class window(QWidget):
 		recursiveSetChildFocusPolicy(self)
 
 
-		#Load all of the widgets into the layout 
+		#Load all of the widgets into the layout
 	def initLayout(self):
 		self.layout.addWidget(self.html, 1, 0, 2, -1)
 		self.layout.addWidget(self.chapterBox, 0, 0, 1, 3)
-		self.layout.addWidget(self.FDButton, 0, 5, 1, 1)		
-		self.layout.addWidget(self.paraCount, 0, 6, 1, 1)	
+		self.layout.addWidget(self.FDButton, 0, 5, 1, 1)
+		self.layout.addWidget(self.paraCount, 0, 6, 1, 1)
 		self.layout.addWidget(self.filebox, 3, 0, 1, 3)
 		self.layout.addWidget(self.brButton, 3, 4, 1, 1)
 		self.layout.addWidget(self.wbButton, 3, 6, 1, 1)
-		self.layout.addWidget(self.webBrButton, 3, 5, 1, 1)	
+		self.layout.addWidget(self.webBrButton, 3, 5, 1, 1)
 		self.layout.addWidget(self.lButton, 4, 2, 1, 1)
 		self.layout.addWidget(self.rButton, 4, 3, 1, 1)
 		self.layout.addWidget(self.sButton, 4, 5, 1, 1)
@@ -541,14 +541,14 @@ class window(QWidget):
 		for x in self.buttons:
 			x.setDisabled(True)
 
-	#Enable all of the buttons, 
+	#Enable all of the buttons,
 	def enButtons(self):
 		for x in self.buttons:
 			x.setDisabled(False)
 		if(self.dts.filepath == ""):
 			self.noFicEnButtons()
 		if(len(self.iniWin.dirs) <= 0):
-			self.ldButton.setDisabled(True)	
+			self.ldButton.setDisabled(True)
 		if(self.windowTitle() == "Paragraph Fic Reader Beta"):
 			self.sButton.setDisabled(True)
 
@@ -556,7 +556,7 @@ class window(QWidget):
 	def findDims(self):
 		currentPos = [self.pos().x(), self.pos().y()]
 		currentDim = [self.geometry().width(), self.geometry().height()]
-		return [currentPos, currentDim]		
+		return [currentPos, currentDim]
 
 	#Opens the changeFont window, allowing for users to pick their family and size.
 	#Might add the functionality that the theme applies, too.
@@ -620,7 +620,7 @@ class window(QWidget):
 		self.detWin.closed.connect(onClose)
 		self.detWin.show()
 
-	#Show the ao3 web browser 
+	#Show the ao3 web browser
 	def webGet(self):
 		self.disButtons()
 		dims = self.findDims()
@@ -643,7 +643,7 @@ class window(QWidget):
 
 		#Get the HTML filename from the user through browse
 	def get_file(self):
-		file = QFileDialog.getOpenFileName(self.brWindow, "", "", "Text files (*.txt, *.html)")	
+		file = QFileDialog.getOpenFileName(self.brWindow, "", "", "Text files (*.txt, *.html)")
 		return file
 
 		#Load chapterbox with chapter titles
@@ -685,7 +685,7 @@ class window(QWidget):
 			self.setText()
 			if(self.dts.currPages[self.dts.chapter] == len(self.dts.chapters[self.dts.chapter][2]) - 1):
 				self.rButton.setDisabled(True)
-			
+
 		self.lButton.setDisabled(False)
 
 		#Handle left and right key presses
@@ -714,7 +714,7 @@ class window(QWidget):
 		self.setPara()
 
 	def getURL(self):
-		self.disButtons()		
+		self.disButtons()
 		def passURL():
 			self.urlWin.tempEnt.setDisabled(True)
 			self.subURL(self.urlWin.tempBox.text())
@@ -738,7 +738,7 @@ class window(QWidget):
 			self.detWin.win.setText(temp[2])
 			self.dts.fandom = temp[3]
 			self.setWindowTitle(self.dts.title)
-			self.chapterBox.clear()	
+			self.chapterBox.clear()
 			self.dts.pFile(self.height(), self.width())
 			self.initAfterFile()
 			self.urlWin.close()
@@ -746,7 +746,7 @@ class window(QWidget):
 	def initAfterFile(self):
 		self.setText()
 		self.setPara()
-		self.loadChapBox()		
+		self.loadChapBox()
 		self.rButton.setDisabled(False)
 		self.chapterBox.setDisabled(False)
 		self.sButton.setDisabled(False)
@@ -754,7 +754,7 @@ class window(QWidget):
 
 	def ldIniHelper(self, file):
 		temp = findTags(file)
-		self.chapterBox.clear()		
+		self.chapterBox.clear()
 		self.dts.filepath = file
 		self.dts.title = temp[1]
 		self.dts.fandom = temp[2]
@@ -762,14 +762,14 @@ class window(QWidget):
 		self.dts.pFile(self.height(), self.width())
 		self.detWin.win.setText(temp[0])
 		self.setWindowTitle(temp[1])
-		self.initAfterFile()	
+		self.initAfterFile()
 
-		#Load html file 
+		#Load html file
 	def ldFile(self):
 		self.disButtons()
 		file = self.get_file()
 		file = file[0]
-		
+
 		if(file != ""):
 			try:
 				temp = findTags(file)
@@ -796,7 +796,7 @@ class window(QWidget):
 					if(self.dts.filepath != ""):
 						self.enButtons()
 					else:
-						self.noFicEnButtons()				
+						self.noFicEnButtons()
 
 				self.alert.closed.connect(onClose)
 		else:
@@ -847,7 +847,7 @@ class window(QWidget):
 			print("Error")
 
 	def loadFicWin(self):
-		self.disButtons()	
+		self.disButtons()
 		def onClose():
 			if(self.dts.filepath != ""):
 				self.enButtons()
@@ -866,11 +866,11 @@ class window(QWidget):
 		self.iniWin.retSig.connect(onRet)
 
 		self.setDims(self.iniWin)
-		self.iniWin.show()	
+		self.iniWin.show()
 
 	def openAO3Page(self):
 		self.disButtons()
-		# self.web.web.load(QUrl("https://archiveofourown.org/media"))	
+		# self.web.web.load(QUrl("https://archiveofourown.org/media"))
 		def onClose():
 				self.enButtons()
 		self.web.closed.connect(onClose)
@@ -879,9 +879,11 @@ class window(QWidget):
 
 
 if __name__ == "__main__":
-	app = ApplicationContext()	
+	# app = ApplicationContext()
+	app = QApplication(sys.argv)
 	test = window()
 
 	# test.show()
-	exit_code = app.app.exec_()
+	# exit_code = app.app.exec_()
+	exit_code = app.exec()
 	sys.exit(exit_code)
