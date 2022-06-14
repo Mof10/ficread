@@ -701,7 +701,7 @@ class window(QWidget):
 			self.html.verticalScrollBar().setValue(int(self.html.verticalScrollBar().value() + 1.5 * self.font.pointSize()))
 		if event.key() == Qt.Key_Up:
 			#Scroll Up
-			self.html.verticalScrollBar().setValue((self.html.verticalScrollBar().value() - 1.5 * self.font.pointSize()))
+			self.html.verticalScrollBar().setValue(int((self.html.verticalScrollBar().value() - 1.5 * self.font.pointSize())))
 
 
 	def loadChapBox(self):
