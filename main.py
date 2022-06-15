@@ -135,7 +135,12 @@ def findTags(file):
 	#searching for the tag window, title + author, fandom, and the URL.
 	soup = BeautifulSoup(codecs.open(file, 'r', 'utf-8'), "html.parser")
 	temp.append(str(soup.find("dl", class_="tags")))
-	temp.append(soup.find("h1").get_text() + " by " + soup.find("a", rel="author").get_text())
+	author = soup.find("a", rel="author")
+	if author is None:
+		author = "Anonymous"
+	else:
+		author = author.get_text()
+	temp.append((soup.find("h1").get_text() + " by " + author).get_text())
 	fandom = soup.find(text="Fandom:")
 	fandom = fandom.next_element
 	fandom = fandom.next_element

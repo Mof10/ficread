@@ -6,10 +6,10 @@ from PyQt5.QtWidgets import QFileDialog
 if __name__ == 'main':
 	from PyQt5.QtWidgets import QApplication
 
-headers = {'Accept': '*/*', 
-		'Connection': 'keep-alive', 
-		'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.84 Safari/537.36', 
-		'Accept-Language': 'en-US;q=0.5,en;q=0.3', 
+headers = {'Accept': '*/*',
+		'Connection': 'keep-alive',
+		'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.84 Safari/537.36',
+		'Accept-Language': 'en-US;q=0.5,en;q=0.3',
 		'Referer': 'https://google.com'
 		}
 
@@ -46,7 +46,11 @@ def importHTML(url, doAsk, defSave):
 		test2 = soup.find(href=findHTML).get("href")
 		title = soup.find("h2", class_="title heading").get_text()
 		title = title.strip()
-		author = soup.find("a", rel="author").get_text()
+		author = soup.find("a", rel="author")
+		if author is None:
+			author = "Anonymous"
+		else:
+			author = author.get_text()
 		fandom = soup.find("dd", class_="fandom tags")
 		fandom = fandom.find_all("a", class_="tag")
 		fanList = ""
@@ -56,7 +60,7 @@ def importHTML(url, doAsk, defSave):
 		# print(fanList)
 		# fandom = fandom.next_element
 		# fandom = fandom.next_element
-		
+
 		deets = str(soup.find("head")) + str(soup.find("div", class_="wrapper", id = ""))
 
 		ret = []
@@ -67,7 +71,7 @@ def importHTML(url, doAsk, defSave):
 			save = saveName()
 		else:
 			real = re.findall('[0-9]+', url)
-		
+
 			save = defSave + real[0] + " - " + re.sub('["/:*?<>|]', '', title).replace("\\", "") + " by " + re.sub('"[/:*?<>|]', '', author).replace("\\", "") + ".html"
 
 		ret.append(save)
